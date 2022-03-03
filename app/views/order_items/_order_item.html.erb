@@ -1,0 +1,3 @@
+<li>
+  <%= order_item.pizza_type.title %> - <%= order_item.amount %> - $<%= '%.2f' % (order_item.pizza_type.price * order_item.amount) %>
+</li>

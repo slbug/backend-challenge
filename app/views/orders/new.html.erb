@@ -1,0 +1,31 @@
+<%= form_for @order do |f| %>
+  <div>
+    <% @order.order_items.each_with_index do |order_item, index| %>
+      <%= f.fields_for :order_items, order_item do |i| %>
+        <p class="<%= index.zero? ? 'new_order_item' : '' %>">
+          <%= i.select :pizza_type_id, options_for_select(PizzaType.all.map { |p| [p.title, p.id, 'data-price' => p.price] }, selected: order_item.pizza_type_id), { prompt: true }, class: 'pizza_type' %>
+          <%= i.number_field :amount, value: i.object.amount, min: 1, step: 1, class: 'pizza_amount' %>
+        </p>
+      <% end %>
+    <% end %>
+  </div>
+  <% if @order.order_items.blank? %>
+    <div>
+      <%= f.fields_for :order_items, @order.order_items.new do |i| %>
+        <p class="new_order_item">
+          <%= i.select :pizza_type_id, options_for_select(PizzaType.all.map { |p| [p.title, p.id, 'data-price' => p.price] }), { prompt: true }, class: 'pizza_type' %>
+          <%= i.number_field :amount, value: i.object.amount, min: 1, step: 1, class: 'pizza_amount' %>
+        </p>
+      <% end %>
+    </div>
+  <% end %>
+  <p>
+    <%= button_tag 'Add More', class: 'add_more_order_item' %>
+  </p>
+  <p>
+    Total: $<span class="total_price"><%= '%.2f' % @order.order_items.
+                                                          reject {|order_item| order_item.pizza_type_id.nil? }.
+                                                          sum { |order_item| order_item.pizza_type.price * order_item.amount } %></span>
+  </p>
+  <p><%= f.submit %></p>
+<% end %>
